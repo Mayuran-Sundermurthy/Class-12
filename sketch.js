@@ -1,92 +1,98 @@
-var trex, trex_running, trex_collided;
-var ground, invisibleGround, groundImage, cloud_image;
-
-
-
-
-var score;
-
+var garden,rabbit, apple,leaf,orange_leaf, score = 0;
+var gardenImg,rabbitImg,appleImg, leaf_image,orange_leafImage;
+var appleGroup;
 
 function preload(){
-  trex_running = loadAnimation("trex1.png","trex2.png","trex3.png");
-  trex_collided = loadImage("trex_collided.png");
-  cloud_image = loadImage("cloud.png");
-  groundImage = loadImage("ground2.png");
-  
- 
-  
+  gardenImg = loadImage("garden.png");
+  rabbitImg = loadImage("rabbit.png");
+  appleImg = loadImage("apple.png");
+  leaf_image = loadImage("leaf.png");
+  orange_leafImage = loadImage("orangeLeaf.png");
 }
 
-function setup() {
+function setup(){
+  
+  createCanvas(400,400);
+  
+// Moving background
+garden=createSprite(200,200);
+garden.addImage(gardenImg);
 
-  createCanvas(600,200)
-  
-  //create a trex sprite
-  trex = createSprite(50,160,20,50);
-  trex.addAnimation("running", trex_running);
-  trex.scale = 0.5;
-  
-  //create a ground sprite
-  ground = createSprite(200,180,400,20);
-  ground.addImage("ground",groundImage);
-  ground.x = ground.width /2;
-  ground.velocityX = -4;
-  
-  //creating invisible ground
-  invisibleGround = createSprite(200,190,400,10);
-  invisibleGround.visible = false;
-  
-  //generate random numbers
-  var rand =  Math.round(random(1,100))
-  
+//creating boy running
+rabbit = createSprite(180,340,30,30);
+rabbit.scale =0.09;
+rabbit.addImage(rabbitImg);
+garden.depth = rabbit.depth -2;
+
+appleGroup = new Group();
 
 }
+
 
 function draw() {
-  //set background color
-  background(180);
+  background(0);
   
   
-  
-  
-  
-  // jump when the space key is pressed
-  if(keyDown("space")&& trex.y >= 100) {
-    trex.velocityY = -10;
+  edges= createEdgeSprites();
+  rabbit.collide(edges);
+
+  rabbit.x = World.mouseX;
+
+  if(rabbit.isTouching(appleGroup)){
+    appleGroup.destroyEach();
+    score = score +1;
   }
-  
-  trex.velocityY = trex.velocityY + 0.8
-  
-  if (ground.x < 0){
-    ground.x = ground.width/2;
-  }
-  
-  //stop trex from falling down
-  trex.collide(invisibleGround);
-  
-  //Spawn Clouds
-  spawnClouds()
-  
+  createApples();
+  createLeaves();
   drawSprites();
+
+  text("Score: " + score, 200,375);
 }
 
-//function to spawn the clouds
-function spawnClouds(){
- // write your code here 
- 
- if(frameCount% 60 == 0){
-  var cloud = createSprite(600,140,40,10);
-  cloud.addImage(cloud_image);
-  cloud.scale = 0.4;
-  cloud.y = Math.round(random(20,80));
-  cloud.velocityX = -5;
-  cloud.depth = trex.depth;
-  trex.depth = trex.depth + 1;
-  console.log(trex.depth);
-  console.log(cloud.depth);
- }
- 
+function createApples() {
+
+  
+  if(frameCount% 60 == 0) {
+    apple = createSprite(200,50);
+    apple.addImage(appleImg);
+  apple.scale = 0.05;
+  
+  console.log(apple.y);
+    apple.x = Math.round(random(50,350));
+    apple.velocityY = 5; 
+    apple.depth = rabbit.depth;
+    rabbit.depth = rabbit.depth +1; 
+    apple.lifetime = 80; 
+    appleGroup.add(apple);
+
+  }
+  
+
 }
 
+function createLeaves(){
+  
+  
+  
 
+  if(frameCount% 60 == 0) {
+    leaf = createSprite(200,0);
+    leaf.x = Math.round(random(50,350));
+    leaf.depth = 0;
+    leaf.lifetime = 80;
+    leaf.addImage(leaf_image);
+    leaf.velocityY = 3; 
+    leaf.scale = 0.03;
 
+  }
+
+  if(frameCount% 90 == 0) {
+    orange_leaf = createSprite(200,0);
+    orange_leaf.x = Math.round(random(50,350));
+    orange_leaf.lifetime = 80;
+    orange_leaf.addImage(orange_leafImage);
+    orange_leaf.velocityY = 3;
+    orange_leaf.scale = 0.03;
+
+  }
+}
